@@ -5,6 +5,8 @@ import { MiniWeather } from './Component/miniWeather';
 import  {Wrapper}  from './Component/wrapper';
 import './css/app.css';
 import React, { useEffect } from 'react';
+import cities from 'cities.json';
+import { Input } from './Component/Input';
 
 function App() {
   var date = new Date();
@@ -13,11 +15,57 @@ function App() {
   const [dates, setDates] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isNotValid, setIsNotValid] = React.useState(false);
+  const [clues, setClues] = React.useState([]);
+  const [inputValue, setInputValue] = React.useState('');
+  const allCityJson = cities;
 
+
+  // React.useEffect(() => {
+  //   const fetchData = async () => {
+  //     setIsLoading(true);
+  
+  //     try {
+  //       if (!city) {
+  //         setIsNotValid(true);
+  //         return;
+  //       }
+  //       const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&APPID=6557810176c36fac5f0db536711a6c52`);
+  //       const json = await response.json();
+  //       setData(json);
+  //       if (json && json.list && json.list.length > 0) {
+  //         const nextDates = nextDays();
+  //         setDates(nextDates);
+  //       }
+  //     } catch (error) {
+  //       console.warn(error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+  
+  //   const fetchGEOData = async () => {
+  //     try {
+  //       setIsLoading(true);
+  //       const response = await fetch(`https://ipapi.co/json`);
+  //       const json = await response.json();
+  //       setCity(json.city);
+  //     } catch (error) {
+  //       console.warn(error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  
+  //   if (city) {
+  //     fetchData();
+  //   } else {
+  //     fetchGEOData();
+  //   }
+  // }, [city]);
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-  
+
       try {
         if (!city) {
           setIsNotValid(true);
@@ -32,11 +80,12 @@ function App() {
         }
       } catch (error) {
         console.warn(error);
+        setIsNotValid(true); // Обработка ошибки, установка isNotValid в true
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     const fetchGEOData = async () => {
       try {
         setIsLoading(true);
@@ -45,42 +94,67 @@ function App() {
         setCity(json.city);
       } catch (error) {
         console.warn(error);
+        setIsNotValid(true); // Обработка ошибки, установка isNotValid в true
       } finally {
         setIsLoading(false);
       }
-    }
-  
-    if (city) {
-      fetchData();
-    } else {
-      fetchGEOData();
-    }
+    };
+
+    fetchData();
+    fetchGEOData();
   }, [city]);
+
+  // const handleSumbit = async (e) => {
+  //   if (e.key === 'Enter') {
+  //     const inputCity = e.target.value;
+  //     setIsLoading(true);
+  //     try {
+  //       const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${inputCity}&APPID=6557810176c36fac5f0db536711a6c52`);
+  //       const json = await response.json();
+  //       if (json.cod === 200) {
+  //         setCity(inputCity);
+  //         setIsNotValid(false);
+  //       } else {
+  //         setIsNotValid(true);
+  //       }
+  //     } catch (error) {
+  //       console.warn(error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //     document.querySelector('input').value = '';
+  //   }
+  // }
   
 
-  const handleSumbit = async (e) => {
+  // const clueChange = (e) => {
+  //   const inputCurrent = e.target.value.toLowerCase().trim();
+  //   const arrClue = allCityJson
+  //   .flatMap(arr => arr)
+  //   .filter(obj => obj.name.toLowerCase().includes(inputCurrent))
+  //   .map(obj => obj.name);
+  //   setClues(arrClue);
+  //   console.log(clues);
+  // }
+  const clueChange = (e) => {
+    setInputValue(e.target.value.toLowerCase().trim());
+  };
+
+  useEffect(() => {
+    const filteredClues = allCityJson
+      .flatMap(arr => arr)
+      .filter(obj => obj.name.toLowerCase().includes(inputValue))
+      .map(obj => obj.name);
+    setClues(filteredClues);
+  }, [inputValue, allCityJson]);
+
+  const handleSumbit = (e) => {
     if (e.key === 'Enter') {
-      const inputCity = e.target.value;
-      setIsLoading(true);
-      try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${inputCity}&APPID=6557810176c36fac5f0db536711a6c52`);
-        const json = await response.json();
-        if (json.cod === 200) {
-          setCity(inputCity);
-          setIsNotValid(false);
-        } else {
-          setIsNotValid(true);
-        }
-      } catch (error) {
-        console.warn(error);
-      } finally {
-        setIsLoading(false);
-      }
-      document.querySelector('input').value = '';
+      setCity(inputValue);
+      setInputValue('');
+      setIsNotValid(false);
     }
-  }
-  
-
+  };
   
 
   const getNextDate = (daysToAdd) => {
@@ -98,6 +172,7 @@ function App() {
     return dates;
   }
 
+
   
 
 
@@ -105,17 +180,17 @@ function App() {
     <div className="App">
       {isLoading ? (
         <>
-          <input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/>
+        <Input handleSumbit={handleSumbit} clueChange={clueChange} clues={clues}/>
           <Skeleton/>
         </>
       ) : isNotValid ? (
         <>
-          <input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/> 
+        <Input handleSumbit={handleSumbit} clueChange={clueChange} clues={clues}/>
           <div className='wrapper-intro-box'><MainIntro /></div>
         </>
       ) : (
         <>
-          <input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/>
+          <Input handleSumbit={handleSumbit} clueChange={clueChange} clues={clues}/>
           <div className='weather-block'>
             <Wrapper name={data === '' ? '' : (data.city ? data.city.name : '')}
               photo={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].icon : '')}
