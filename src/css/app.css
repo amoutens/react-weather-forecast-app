@@ -263,3 +263,17 @@ input {
 .w4u {
   color: rgb(5, 70, 161);
 }
+
+.inputBox {
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+.inputBox p {
+  margin: auto;
+  font-size: 0.9em;
+  text-align: center;
+  color: rgb(89, 92, 95);
+}

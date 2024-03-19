@@ -152,3 +152,14 @@ input {
   .w4u {
         color: rgb(5, 70, 161)
   }
+  .inputBox {
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    p {
+        margin: auto;
+        font-size: 0.9em;
+        text-align: center;
+        color:rgb(89, 92, 95);
+    }
+  }
