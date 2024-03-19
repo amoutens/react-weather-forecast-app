@@ -1,4 +1,5 @@
 
+import { MainIntro } from './Component/MainIntro';
 import { Skeleton } from './Component/Skeleton';
 import { MiniWeather } from './Component/miniWeather';
 import  {Wrapper}  from './Component/wrapper';
@@ -11,12 +12,17 @@ function App() {
   const [city, setCity] = React.useState();
   const [dates, setDates] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isNotValid, setIsNotValid] = React.useState(false);
 
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
   
       try {
+        if (!city) {
+          setIsNotValid(true);
+          return;
+        }
         const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&APPID=6557810176c36fac5f0db536711a6c52`);
         const json = await response.json();
         setData(json);
@@ -52,12 +58,28 @@ function App() {
   }, [city]);
   
 
-  const handleSumbit = (e) => {
-    if(e.key === 'Enter'){
-      setCity(e.target.value);
+  const handleSumbit = async (e) => {
+    if (e.key === 'Enter') {
+      const inputCity = e.target.value;
+      setIsLoading(true);
+      try {
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${inputCity}&APPID=6557810176c36fac5f0db536711a6c52`);
+        const json = await response.json();
+        if (json.cod === 200) {
+          setCity(inputCity);
+          setIsNotValid(false);
+        } else {
+          setIsNotValid(true);
+        }
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setIsLoading(false);
+      }
       document.querySelector('input').value = '';
-    } 
+    }
   }
+  
 
   
 
@@ -81,37 +103,46 @@ function App() {
 
   return (
     <div className="App">
-      {isLoading ? <><input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/>
-      <Skeleton/>
-      </> : (
-  <>
-    <input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/>
-    <div className='weather-block'>
-      <Wrapper name={data === '' ? '' : (data.city ? data.city.name : '')}
-        photo={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].icon : '')}
-        dayOfWeek={data === '' ? '' : (date.toLocaleDateString('en-US', {weekday : 'long'}))}
-        temp={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].main : '')}
-        weather={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].description : '')}
-      />
-      <div className='mini-block'>
-        <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[0]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-          data={data} date={dates[0]}
-        />
-        <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[1]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-          data={data} date={dates[1]}
-        />
-        <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[2]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-          data={data} date={dates[2]}
-        />
-        <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[3]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-          data={data} date={dates[3]}
-        />
-      </div>
-    </div>
-  </>
-)}
+      {isLoading ? (
+        <>
+          <input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/>
+          <Skeleton/>
+        </>
+      ) : isNotValid ? (
+        <>
+          <input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/> 
+          <div className='wrapper-intro-box'><MainIntro /></div>
+        </>
+      ) : (
+        <>
+          <input className='input' type='text' placeholder='Input your city' onKeyDown={(e) => handleSumbit(e)}/>
+          <div className='weather-block'>
+            <Wrapper name={data === '' ? '' : (data.city ? data.city.name : '')}
+              photo={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].icon : '')}
+              dayOfWeek={data === '' ? '' : (date.toLocaleDateString('en-US', {weekday : 'long'}))}
+              temp={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].main : '')}
+              weather={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].description : '')}
+            />
+            <div className='mini-block'>
+              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[0]).toLocaleDateString('en-US', {weekday : 'long'}))} 
+                data={data} date={dates[0]}
+              />
+              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[1]).toLocaleDateString('en-US', {weekday : 'long'}))} 
+                data={data} date={dates[1]}
+              />
+              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[2]).toLocaleDateString('en-US', {weekday : 'long'}))} 
+                data={data} date={dates[2]}
+              />
+              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[3]).toLocaleDateString('en-US', {weekday : 'long'}))} 
+                data={data} date={dates[3]}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
+  
 }
 
 export default App;
