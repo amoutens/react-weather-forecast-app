@@ -118,6 +118,7 @@ function App() {
 
   const handleClueClick = (city) => {
     setCity(city);
+    isNotValid? setIsNotValid(false) : setIsNotValid(true);
     document.querySelector('input').value = '';
     setClues([]);
   };
@@ -126,42 +127,26 @@ function App() {
 
   return (
     <div className="App">
+      <Input handleSumbit={handleSumbit} clueChange={clueChange} clues={clues} handleClueClick={handleClueClick} />
       {isLoading ? (
-        <>
-        <Input handleSumbit={handleSumbit} clueChange={clueChange} clues={clues} handleClueClick={handleClueClick}/>
-          <Skeleton/>
-        </>
+        <Skeleton />
       ) : isNotValid ? (
-        <>
-        <Input handleSumbit={handleSumbit} clueChange={clueChange} clues={clues} handleClueClick={handleClueClick}/>
-          <div className='wrapper-intro-box'><MainIntro /></div>
-        </>
+        <div className='wrapper-intro-box'><MainIntro /></div>
       ) : (
-        <>
-          <Input handleSumbit={handleSumbit} clueChange={clueChange} clues={clues} handleClueClick={handleClueClick}/>
-          <div className='weather-block'>
-            <Wrapper name={data === '' ? '' : (data.city ? data.city.name : '')}
-              photo={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].icon : '')}
-              dayOfWeek={data === '' ? '' : (date.toLocaleDateString('en-US', {weekday : 'long'}))}
-              temp={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].main : '')}
-              weather={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].description : '')}
-            />
-            <div className='mini-block'>
-              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[0]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-                data={data} date={dates[0]}
-              />
-              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[1]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-                data={data} date={dates[1]}
-              />
-              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[2]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-                data={data} date={dates[2]}
-              />
-              <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[3]).toLocaleDateString('en-US', {weekday : 'long'}))} 
-                data={data} date={dates[3]}
-              />
-            </div>
+        <div className='weather-block'>
+          <Wrapper name={data === '' ? '' : (data.city ? data.city.name : '')}
+            photo={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].icon : '')}
+            dayOfWeek={data === '' ? '' : (date.toLocaleDateString('en-US', { weekday: 'long' }))}
+            temp={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].main : '')}
+            weather={data === '' ? '' : (data.list && data.list.length > 0 ? data.list[0].weather[0].description : '')}
+          />
+          <div className='mini-block'>
+            <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[0]).toLocaleDateString('en-US', { weekday: 'long' }))} data={data} date={dates[0]} />
+            <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[1]).toLocaleDateString('en-US', { weekday: 'long' }))} data={data} date={dates[1]} />
+            <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[2]).toLocaleDateString('en-US', { weekday: 'long' }))} data={data} date={dates[2]} />
+            <MiniWeather dayOfWeek={data === '' ? '' : (new Date(dates[3]).toLocaleDateString('en-US', { weekday: 'long' }))} data={data} date={dates[3]} />
           </div>
-        </>
+        </div>
       )}
     </div>
   );

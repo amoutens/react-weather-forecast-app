@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
 export const Input = ({handleSumbit, clueChange, clues, handleClueClick}) => {
-  const firstFiveClues = clues.slice(0, 3);
-  const renderedClues = firstFiveClues.map((city, index) => (
-    <span key={index} onClick={() => handleClueClick(city)}>{`${city} ${index === 2 ? '' : ', '}`}</span>
+  const firstThreeClues = clues.slice(0, 3);
+  console.log(firstThreeClues)
+  const renderedClues = firstThreeClues.map((city, index) => (
+    <span key={index} onClick={() => handleClueClick(city)}>{`${city} ${( index === firstThreeClues.length -1) ? '' : ', '}`}</span>
   ));
 
   return (
